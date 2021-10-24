@@ -33,5 +33,5 @@ begin
             end if;
         end if;
     end process counter; 
-addr <= std_logic_vector(add_count);                
+addr <= std_logic_vector (add_count);                
 end synth;
