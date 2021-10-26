@@ -76,34 +76,49 @@ architecture synth of controller is
     constant op_br_great_uns: std_logic_vector   := "110110"; --- 0x36
     constant op_call        : std_logic_vector   := "000000"; --- 0x00
     constant op_jmpi        : std_logic_vector   := "000001"; --- 0x01
-
-
+    constant op_andi        : std_logic_vector   := "001100"; --- 0x0C
+    constant op_ori         : std_logic_vector   := "010100"; --- 0x14
+    constant op_xnori       : std_logic_vector   := "011100"; --- 0x1C
+    constant op_cmplei      : std_logic_vector   := "001000": --- 0x08
+    constant op_cmpgti      : std_logic_vector   := "010000": --- 0x10
+    constant op_cmpnei      : std_logic_vector   := "011000": --- 0x18
+    constant op_cmpeqi      : std_logic_vector   := "100000": --- 0x20
+    constant op_cmpleui     : std_logic_vector   := "101000": --- 0x28
+    constant op_cmpgtui     : std_logic_vector   := "110000": --- 0x30
+   
     -----different-opx-type------
-    constant opx_and       : std_logic_vector   := "001110"; --- 0x0E
-    constant opx_srl       : std_logic_vector   := "011011"; --- 0x1B
-    constant opx_break     : std_logic_vector   := "110100"; --- 0x34
-    constant opx_callr     : std_logic_vector   := "011101"; --- 0x1D
-    constant opx_jmp       : std_logic_vector   := "001101"; --- 0x0D
-    constant opx_ret       : std_logic_vector   := "000101"; --- 0x05
+    constant opx_and        : std_logic_vector   := "001110"; --- 0x0E
+    constant opx_srl        : std_logic_vector   := "011011"; --- 0x1B
+    constant opx_break      : std_logic_vector   := "110100"; --- 0x34
+    constant opx_callr      : std_logic_vector   := "011101"; --- 0x1D
+    constant opx_jmp        : std_logic_vector   := "001101"; --- 0x0D
+    constant opx_ret        : std_logic_vector   := "000101"; --- 0x05
+    constant opx_cmpne      : std_logic_vector   := "011000": --- 0x18
+    constant opx_cmpeq      : std_logic_vector   := "100000": --- 0x20
+    constant opx_cmpleu     : std_logic_vector   := "101000": --- 0x28
+    constant opx_cmpgtu     : std_logic_vector   := "110000": --- 0x30
+    constant opx_rol        : std_logic_vector   := "000011": --- 0x03
+    constant opx_ror        : std_logic_vector   := "001011": --- 0x0B
+    constant opx_roli       : std_logic_vector   := "000010": --- 0x02
 
     -----ALU-OP-----------------
-    constant alu_add       : std_logic_vector   := "000000";
-    constant alu_sub       : std_logic_vector   := "001000";
-    constant alu_leq_si    : std_logic_vector   := "011001";
-    constant alu_great_si  : std_logic_vector   := "011010";
-    constant alu_noteq     : std_logic_vector   := "011011";
-    constant alu_eq        : std_logic_vector   := "011100";
-    constant alu_leq_uns   : std_logic_vector   := "011101";
-    constant alu_great_uns : std_logic_vector   := "011110";
-    constant alu_nor       : std_logic_vector   := "100000";
-    constant alu_and       : std_logic_vector   := "100001";
-    constant alu_or        : std_logic_vector   := "100010";
-    constant alu_xnor      : std_logic_vector   := "100011";
-    constant alu_rol       : std_logic_vector   := "110000";
-    constant alu_ror       : std_logic_vector   := "110001";
-    constant alu_sll       : std_logic_vector   := "110010";
-    constant alu_srl       : std_logic_vector   := "110011";
-    constant alu_sra       : std_logic_vector   := "110111";
+    constant alu_add        : std_logic_vector   := "000000";
+    constant alu_sub        : std_logic_vector   := "001000";
+    constant alu_leq_si     : std_logic_vector   := "011001";
+    constant alu_great_si   : std_logic_vector   := "011010";
+    constant alu_noteq      : std_logic_vector   := "011011";
+    constant alu_eq         : std_logic_vector   := "011100";
+    constant alu_leq_uns    : std_logic_vector   := "011101";
+    constant alu_great_uns  : std_logic_vector   := "011110";
+    constant alu_nor        : std_logic_vector   := "100000";
+    constant alu_and        : std_logic_vector   := "100001";
+    constant alu_or         : std_logic_vector   := "100010";
+    constant alu_xnor       : std_logic_vector   := "100011";
+    constant alu_rol        : std_logic_vector   := "110000";
+    constant alu_ror        : std_logic_vector   := "110001";
+    constant alu_sll        : std_logic_vector   := "110010";
+    constant alu_srl        : std_logic_vector   := "110011";
+    constant alu_sra        : std_logic_vector   := "110111";
 
 begin
 
@@ -147,7 +162,7 @@ end process flp;
 op_alu_gen :process(op, opx) is 
 begin 
     case op is 
-    ------------R_OP----------
+    ------------R_TYPE----------
         when op_r_type  => 
             case opx is 
                 --and--
@@ -157,6 +172,30 @@ begin
                 --srl--    
                 when opx_srl =>
                     s_op_alu <= alu_srl;
+                
+                --cmpne--    
+                when opx_cmpne =>
+                    s_op_alu <= alu_noteq;
+                
+                --cmpeq--    
+                when opx_cmpeq =>
+                    s_op_alu <= alu_eq;
+                    
+                --cmpleu--    
+                when opx_cmpleu =>
+                    s_op_alu <= alu_leq_uns;
+                
+                --cmpgtu--    
+                when opx_cmpgtu =>
+                    s_op_alu <= alu_great_uns;
+
+                --rol--    
+                when opx_rol =>
+                    s_op_alu <= alu_rol;
+                
+                --ror--    
+                when opx_ror =>
+                    s_op_alu <= alu_ror;    
 
                 when others => 
                     --do nothing--    
@@ -197,6 +236,47 @@ begin
 
     when op_br_leq_uns =>
     s_op_alu <= alu_leq_uns;
+
+    ---------I-OP-------------
+    when op_addi => 
+    s_op_alu <= alu_add;
+    s_imm_signed <= '1';
+
+    when op_andi => 
+    s_op_alu <= alu_and;
+    s_imm_signed <= '0';
+
+    when op_ori =>
+    s_op_alu <= alu_or;
+    s_imm_signed <= '0';
+
+    when op_xnori => 
+    s_op_alu <= alu_xnor;
+    s_imm_signed <= '0';
+
+    when op_cmpleui => 
+    s_op_alu <= alu_leq_si;
+    s_imm_signed <= '1';
+
+    when op_cmpgti =>
+    s_op_alu <= alu_great_si;
+    s_imm_signed <= '1';
+
+    when op_cmpnei => 
+    s_op_alu <= alu_noteq;
+    s_imm_signed <= '1';
+
+    when op_cmpeqi =>
+    s_op_alu <= alu_eq;
+    s_imm_signed <= '1';
+
+    when op_cmpleui => 
+    s_op_alu <= alu_leq_uns;
+    s_imm_signed <= '0';
+
+    when op_cmpgtui =>
+    s_op_alu <= alu_great_uns;
+    s_imm_signed <= '0';
 
     ----------------------------      
     when others =>
