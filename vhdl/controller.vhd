@@ -80,16 +80,15 @@ architecture synth of controller is
     constant op_andi        : std_logic_vector   := "001100"; --- 0x0C
     constant op_ori         : std_logic_vector   := "010100"; --- 0x14
     constant op_xnori       : std_logic_vector   := "011100"; --- 0x1C
-    constant op_cmplei      : std_logic_vector   := "001000": --- 0x08
-    constant op_cmpgti      : std_logic_vector   := "010000": --- 0x10
-    constant op_cmpnei      : std_logic_vector   := "011000": --- 0x18
-    constant op_cmpeqi      : std_logic_vector   := "100000": --- 0x20
-    constant op_cmpleui     : std_logic_vector   := "101000": --- 0x28
-    constant op_cmpgtui     : std_logic_vector   := "110000": --- 0x30
+    constant op_cmplei      : std_logic_vector   := "001000"; --- 0x08
+    constant op_cmpgti      : std_logic_vector   := "010000"; --- 0x10
+    constant op_cmpnei      : std_logic_vector   := "011000"; --- 0x18
+    constant op_cmpeqi      : std_logic_vector   := "100000"; --- 0x20
+    constant op_cmpleui     : std_logic_vector   := "101000"; --- 0x28
+    constant op_cmpgtui     : std_logic_vector   := "110000"; --- 0x30
    
     -----different-opx-type------
     constant opx_and       : std_logic_vector   := "001110"; --- 0x0E
-    constant opx_srl       : std_logic_vector   := "011011"; --- 0x1B
     constant opx_break     : std_logic_vector   := "110100"; --- 0x34
     constant opx_callr     : std_logic_vector   := "011101"; --- 0x1D
     constant opx_jmp       : std_logic_vector   := "001101"; --- 0x0D
@@ -108,22 +107,12 @@ architecture synth of controller is
     constant opx_srli      : std_logic_vector   := "011010"; --- 0x1A 
     constant opx_srai      : std_logic_vector   := "111010"; --- 0x3A
     constant opx_roli      : std_logic_vector   := "000010"; --- 0x02
-
-   
-
-    constant opx_and        : std_logic_vector   := "001110"; --- 0x0E
-    constant opx_srl        : std_logic_vector   := "011011"; --- 0x1B
-    constant opx_break      : std_logic_vector   := "110100"; --- 0x34
-    constant opx_callr      : std_logic_vector   := "011101"; --- 0x1D
-    constant opx_jmp        : std_logic_vector   := "001101"; --- 0x0D
-    constant opx_ret        : std_logic_vector   := "000101"; --- 0x05
-    constant opx_cmpne      : std_logic_vector   := "011000": --- 0x18
-    constant opx_cmpeq      : std_logic_vector   := "100000": --- 0x20
-    constant opx_cmpleu     : std_logic_vector   := "101000": --- 0x28
-    constant opx_cmpgtu     : std_logic_vector   := "110000": --- 0x30
-    constant opx_rol        : std_logic_vector   := "000011": --- 0x03
-    constant opx_ror        : std_logic_vector   := "001011": --- 0x0B
-    constant opx_roli       : std_logic_vector   := "000010": --- 0x02
+    constant opx_cmpne     : std_logic_vector   := "011000"; --- 0x18
+    constant opx_cmpeq     : std_logic_vector   := "100000"; --- 0x20
+    constant opx_cmpleu    : std_logic_vector   := "101000"; --- 0x28
+    constant opx_cmpgtu    : std_logic_vector   := "110000"; --- 0x30
+    constant opx_rol       : std_logic_vector   := "000011"; --- 0x03
+    constant opx_ror       : std_logic_vector   := "001011"; --- 0x0B
 
     -----ALU-OP-----------------
     constant alu_add        : std_logic_vector   := "000000";
@@ -162,7 +151,7 @@ s_next_state <= FETCH2 when (s_current_state = FETCH1) else
                 JMP    when (s_current_state = DECODE and op = op_r_type and (opx = opx_jmp or opx = opx_ret)) else  
                 JMPI   when (s_current_state = DECODE and op = op_jmpi) else       
                 BREAK  when ((s_current_state = DECODE and (op = op_break and opx = opx_break)) or (s_current_state = BREAK)) else 
-                SHIFTI when (s_current_state = DECODE and ((opx = opx_slli) or (opx = opx_srli) or (opx = opx_srai) or (opx = opx_roli)))
+                SHIFTI when (s_current_state = DECODE and ((opx = opx_slli) or (opx = opx_srli) or (opx = opx_srai) or (opx = opx_roli))) else
                 R_OP   when (s_current_state = DECODE  and (op = op_r_type)) else 
                 STORE  when (s_current_state = DECODE  and (op = op_store)) else 
                 LOAD1  when (s_current_state = DECODE  and (op = op_load)) else 
@@ -249,8 +238,7 @@ begin
                  --roli--
                  when opx_roli =>
                  s_op_alu <= alu_rol;
-                    s_op_alu <= alu_srl;
-                
+                                 
                 --cmpne--    
                 when opx_cmpne =>
                     s_op_alu <= alu_noteq;
@@ -317,10 +305,6 @@ begin
     s_op_alu <= alu_leq_uns;
 
     ---------I-OP-------------
-    when op_addi => 
-    s_op_alu <= alu_add;
-    s_imm_signed <= '1';
-
     when op_andi => 
     s_op_alu <= alu_and;
     s_imm_signed <= '0';
@@ -333,7 +317,7 @@ begin
     s_op_alu <= alu_xnor;
     s_imm_signed <= '0';
 
-    when op_cmpleui => 
+    when op_cmplei => 
     s_op_alu <= alu_leq_si;
     s_imm_signed <= '1';
 
@@ -382,7 +366,7 @@ pc_sel_a <= '1' when (s_current_state = CALLR or s_current_state = JMP) else '0'
 pc_sel_imm <= '1' when (s_current_state = CALL or s_current_state = JMPI) else '0';
 
 -- register file enable
-rf_wren <= '1' when (s_current_state = I_OP  or s_current_state = R_OP or s_current_state = LOAD2 or s_current_state = CALL or s_current_state = CALLR) else '0'; 
+rf_wren <= '1' when (s_current_state = I_OP  or s_current_state = R_OP or s_current_state = LOAD2 or s_current_state = CALL or s_current_state = CALLR or s_current_state = SHIFTI) else '0'; 
 
 -- multiplexers selections
 sel_addr <= '1' when (s_current_state = LOAD1 or s_current_state = STORE) else '0';
@@ -390,7 +374,7 @@ sel_b <= '1' when (s_current_state = R_OP or s_current_state = BRANCH) else '0';
 sel_mem <= '1' when s_current_state = LOAD2 else '0';
 sel_pc <= '1' when (s_current_state = CALL or s_current_state = CALLR) else '0';
 sel_ra <= '1' when (s_current_state = CALL or s_current_state = CALLR) else '0';
-sel_rC <= '1' when s_current_state = R_OP else '0';
+sel_rC <= '1' when (s_current_state = R_OP or s_current_state = SHIFTI) else '0';
 
 -- write memory output
 read  <= '1' when (s_current_state = LOAD1 or s_current_state = FETCH1) else '0';
