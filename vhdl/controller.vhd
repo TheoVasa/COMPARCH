@@ -130,7 +130,7 @@ s_next_state <= FETCH2 when (s_current_state = FETCH1) else
                 I_OP   when (s_current_state = DECODE) else 
                 FETCH1;
 
-------------------TRANSITION-FLIP-FLOPS------------------
+------------------TRANSITION-FLIP-FLOPS-------------------
 flp :process(clk, reset_n) is 
 begin
         if(reset_n = '0') then 
