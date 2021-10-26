@@ -51,7 +51,8 @@ architecture synth of controller is
         CALL, 
         CALLR,
         JMP,
-        JMPI
+        JMPI,
+        SHIFTI
     );
     -----state-machine-----------
     signal s_current_state : state_type; 
@@ -85,6 +86,23 @@ architecture synth of controller is
     constant opx_callr     : std_logic_vector   := "011101"; --- 0x1D
     constant opx_jmp       : std_logic_vector   := "001101"; --- 0x0D
     constant opx_ret       : std_logic_vector   := "000101"; --- 0x05
+    constant opx_add       : std_logic_vector   := "110001"; --- 0x31 
+    constant opx_sub       : std_logic_vector   := "111001"; --- 0x39 
+    constant opx_cmple     : std_logic_vector   := "001000"; --- 0x08 
+    constant opx_cmpgt     : std_logic_vector   := "010000"; --- 0x10
+    constant opx_nor       : std_logic_vector   := "000110"; --- 0x06
+    constant opx_or        : std_logic_vector   := "010110"; --- 0x16
+    constant opx_xnor      : std_logic_vector   := "011110"; --- 0x1E
+    constant opx_sll       : std_logic_vector   := "010011"; --- 0x13
+    constant opx_srl       : std_logic_vector   := "011011"; --- 0x1B
+    constant opx_sra       : std_logic_vector   := "111011"; --- 0x3B 
+    constant opx_slli      : std_logic_vector   := "010010"; --- 0x12 
+    constant opx_srli      : std_logic_vector   := "011010"; --- 0x1A 
+    constant opx_srai      : std_logic_vector   := "111010"; --- 0x3A
+    constant opx_roli      : std_logic_vector   := "000010"; --- 0x02
+
+   
+
 
     -----ALU-OP-----------------
     constant alu_add       : std_logic_vector   := "000000";
@@ -123,6 +141,7 @@ s_next_state <= FETCH2 when (s_current_state = FETCH1) else
                 JMP    when (s_current_state = DECODE and op = op_r_type and (opx = opx_jmp or opx = opx_ret)) else  
                 JMPI   when (s_current_state = DECODE and op = op_jmpi) else       
                 BREAK  when ((s_current_state = DECODE and (op = op_break and opx = opx_break)) or (s_current_state = BREAK)) else 
+                SHIFTI when (s_current_state = DECODE and ((opx = opx_slli) or (opx = opx_srli) or (opx = opx_srai) or (opx = opx_roli)))
                 R_OP   when (s_current_state = DECODE  and (op = op_r_type)) else 
                 STORE  when (s_current_state = DECODE  and (op = op_store)) else 
                 LOAD1  when (s_current_state = DECODE  and (op = op_load)) else 
@@ -147,17 +166,70 @@ end process flp;
 op_alu_gen :process(op, opx) is 
 begin 
     case op is 
-    ------------R_OP----------
+    ------------R_TYPE----------
         when op_r_type  => 
             case opx is 
                 --and--
                 when opx_and => 
                     s_op_alu <= alu_and;
 
-                --srl--    
-                when opx_srl =>
-                    s_op_alu <= alu_srl;
+                --add--
+                when opx_add =>
+                s_op_alu <= alu_add;
 
+                --sub--
+                when opx_sub =>
+                s_op_alu <= alu_sub;
+
+                --cmple--
+                when opx_cmple =>
+                s_op_alu <= alu_leq_si;
+
+                --cmpgt--
+                when opx_cmpgt =>
+                s_op_alu <= alu_great_si;
+
+                --nor--
+                when opx_nor =>
+                s_op_alu <= alu_nor;
+
+                --or--
+                when opx_or =>
+                s_op_alu <= alu_or;
+
+                --xnor--
+                when opx_xnor =>
+                s_op_alu <= alu_xnor;
+
+                --sll--
+                when opx_sll =>
+                s_op_alu <= alu_sll;
+
+                --srl--
+                when opx_srl =>
+                s_op_alu <= alu_srl;
+
+                --sra--
+                when opx_sra =>
+                s_op_alu <= alu_sra;
+
+                --slli--
+                when opx_slli =>
+                s_op_alu <= alu_sll;
+
+                --srli--
+                when opx_srli =>
+                s_op_alu <= alu_srl;
+
+                --srai--
+                when opx_srai =>
+                s_op_alu <= alu_sra;
+
+                 --roli--
+                 when opx_roli =>
+                 s_op_alu <= alu_rol;
+
+                --others--
                 when others => 
                     --do nothing--    
             end case;                
