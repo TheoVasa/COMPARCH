@@ -88,7 +88,6 @@ architecture synth of controller is
     constant op_cmpgtui     : std_logic_vector   := "110000": --- 0x30
    
     -----different-opx-type------
-<<<<<<< HEAD
     constant opx_and       : std_logic_vector   := "001110"; --- 0x0E
     constant opx_srl       : std_logic_vector   := "011011"; --- 0x1B
     constant opx_break     : std_logic_vector   := "110100"; --- 0x34
@@ -112,7 +111,6 @@ architecture synth of controller is
 
    
 
-=======
     constant opx_and        : std_logic_vector   := "001110"; --- 0x0E
     constant opx_srl        : std_logic_vector   := "011011"; --- 0x1B
     constant opx_break      : std_logic_vector   := "110100"; --- 0x34
@@ -126,7 +124,6 @@ architecture synth of controller is
     constant opx_rol        : std_logic_vector   := "000011": --- 0x03
     constant opx_ror        : std_logic_vector   := "001011": --- 0x0B
     constant opx_roli       : std_logic_vector   := "000010": --- 0x02
->>>>>>> 59a251491ce00b3fa17b81b693566187d40524e7
 
     -----ALU-OP-----------------
     constant alu_add        : std_logic_vector   := "000000";
@@ -231,7 +228,6 @@ begin
 
                 --srl--
                 when opx_srl =>
-<<<<<<< HEAD
                 s_op_alu <= alu_srl;
 
                 --sra--
@@ -253,7 +249,6 @@ begin
                  --roli--
                  when opx_roli =>
                  s_op_alu <= alu_rol;
-=======
                     s_op_alu <= alu_srl;
                 
                 --cmpne--    
@@ -279,7 +274,6 @@ begin
                 --ror--    
                 when opx_ror =>
                     s_op_alu <= alu_ror;    
->>>>>>> 59a251491ce00b3fa17b81b693566187d40524e7
 
                 --others--
                 when others => 
