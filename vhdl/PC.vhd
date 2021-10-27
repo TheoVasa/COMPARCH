@@ -17,20 +17,18 @@ entity PC is
 end PC;
 
 architecture synth of PC is
-    signal current_add_count : signed(31 downto 0) := to_signed(0, 32);
-    signal next_add_count    : signed(31 downto 0) := to_signed(0, 32);
+    signal addr_vector       : std_logic_vector(15 downto 0);
+    signal current_add_count : signed(15 downto 0) := to_signed(0, 16);
+    signal next_add_count    : signed(15 downto 0) := to_signed(0, 16);
     signal sig_imm           : std_logic_vector(31 downto 0);
     signal shifted_imm       : std_logic_vector(15 downto 0);
     signal sig_a             : std_logic_vector(31 downto 0);
-    constant sixteenzeros    : std_logic_vector(15 downto 0) := (others => '0');
 
 begin
     shifted_imm <= imm(13 downto 0) & "00";
-    sig_imm <= (31 downto shifted_imm'length => '0') & shifted_imm;
-    sig_a   <= (31 downto a'length => '0') & a;
     next_add_count <= current_add_count + signed(imm) when (add_imm = '1') else 
-                      signed(sig_imm) when (sel_imm = '1') else 
-                      signed(sig_a) when (sel_a = '1') else 
+                      signed(shifted_imm) when (sel_imm = '1') else 
+                      signed(a) when (sel_a = '1') else 
                       current_add_count + 4;
     counter : process(clk, en, reset_n) is 
     begin 
@@ -42,7 +40,6 @@ begin
             end if;
         end if;
     end process counter; 
-addr <= std_logic_vector (current_add_count);
-addr(1 downto 0) <= "00";
-addr(31 downto 16) <= sixteenzeros;                
+addr_vector <= std_logic_vector(current_add_count);    
+addr <= (15 downto 0 => '0') & addr_vector(15 downto 2) & "00";           
 end synth;
