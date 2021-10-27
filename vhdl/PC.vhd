@@ -22,7 +22,7 @@ architecture synth of PC is
     signal sig_imm           : std_logic_vector(31 downto 0);
     signal shifted_imm       : std_logic_vector(15 downto 0);
     signal sig_a             : std_logic_vector(31 downto 0);
-    constant sixteenzeros    : std_logic_vector(15 downto 0) := (others <= 0)
+    constant sixteenzeros    : std_logic_vector(15 downto 0) := (others => '0');
 
 begin
     shifted_imm <= imm(13 downto 0) & "00";
@@ -42,11 +42,7 @@ begin
             end if;
         end if;
     end process counter; 
-addr <= std_logic_vector (current_add_count) ;
+addr <= std_logic_vector (current_add_count);
 addr(1 downto 0) <= "00";
-addr(31 downto 15) <= sixteenzeros;         
+addr(31 downto 16) <= sixteenzeros;                
 end synth;
-
-// address: everything on 16v bits -> output cincantenate 16 0s and override 2 LSBs to 0s
-
-// 
