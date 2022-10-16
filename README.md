@@ -1,2 +1,2 @@
-# COMPARCH
-COMPARCH REPOSITORY FOR JOYTI AND THEO
+# PROCESSOR IN VHDL
+Exploring Computer Architecture by building a full processor in vhdl
